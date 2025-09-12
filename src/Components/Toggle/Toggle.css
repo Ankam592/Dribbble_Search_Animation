@@ -1,0 +1,30 @@
+.toggleon,
+.toggleoff {
+  width: 20px;       /* smaller width */
+  height: 11px;      /* smaller height */
+  border: 1px solid black;
+  background-color: black;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.toggleon div,
+.toggleoff div {
+  height:9.5px;       /* smaller circle */
+  width: 9.5px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  position: absolute;
+  transition: all 0.2s ease;
+}
+
+.toggleon div {
+  right: 1px;
+}
+
+.toggleoff div {
+  left: 1px;
+}

@@ -1,0 +1,192 @@
+.element {
+  flex: 0 1 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  color: #f5f6f8;
+  position: relative;
+}
+
+
+.usericon {
+  flex: 0 1 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
+  color: #9e9e9e;
+  border: none;
+  height: 25px;
+  border-radius: 4px;
+  position: relative;
+
+}
+
+.elementdetails {
+  flex: 1;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 2px 2px 2px 5px;
+  flex-wrap: wrap;
+}
+
+.elementname {
+  flex: 0 1 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: none;
+  font-family: 'Inter', 'SF Pro Text', sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  /* semi-bold */
+  color: #000000;
+  white-space: pre-wrap;
+  margin-right: 10px;
+}
+
+.elementname p {
+  font-family: 'Inter', 'SF Pro Text', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  /* semi-bold */
+  color: #000000;
+  padding: 0;
+  margin: 0;
+}
+
+.elementin {
+  flex: 0 1 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-wrap: wrap;
+  color: #9e9e9e;
+  padding: none;
+}
+
+.elementin p {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', 'SF Pro Text', sans-serif;
+  font-size: 11px;
+}
+
+.Personactive {
+  position: absolute;
+  height: 25%;
+  width: 25%;
+  border-radius: 50%;
+  background-color: green;
+  right: -2px;
+  bottom: -1px;
+  border: 1.5px solid #FFFFFF;
+}
+
+.PersonInactive {
+  position: absolute;
+  height: 25%;
+  width: 25%;
+  border-radius: 50%;
+  background-color: orange;
+  right: -2px;
+  bottom: -1px;
+  border: 1.5px solid #FFFFFF;
+
+}
+
+.highlight {
+  background-color: #ffe0b2;
+  border-radius: 2px;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #d3d3d3;
+  ;
+}
+
+.filesCount {
+  border-radius: 2px;
+  padding: 0.5px 2px 0.5px 2px;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+}
+
+.filesCount p {
+  font-size: 10px;
+  color: #9e9e9e;
+}
+
+.elementuse {
+  flex: 0 1 25%;
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  right: 0px;
+  opacity: 0;
+  visibility: hidden;
+  position: relative;
+}
+
+.newWindow {
+  flex: 0 1 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.newWindow p {
+
+  font-size: 10px;
+  color: #9e9e9e;
+  font-weight: 560;
+  padding-left: 5px;
+
+}
+
+.element:hover .elementuse {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+
+
+
+.copylinkTitle {
+
+  position: absolute;
+  top: -50%;
+  right: 58%;
+  width: 75px;
+  height: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  background-color: #000000;
+  border-radius: 3px;
+  gap: 2px
+}
+
+.copylinkTitle p {
+  color: #FFFFFF;
+  font-size: 10px;
+}
+
+.copyLink {
+  padding: 5px;
+}
+
+.copyLink:hover {
+  padding: 5px;
+  border-radius: 5px;
+
+  background-color: #e0e0e0;
+}

@@ -1,0 +1,19 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif; /* clean modern font */
+  background-color: #e5e5e5; /* or whatever matches Dribbble UI */
+  min-height: 100vh; /* full height */
+  width: 100%;       /* full width */
+}
+
+.main_div {
+  flex: 0 1 auto;   /* let it size naturally */
+  display: flex;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* full height */
+  width: 100%;       /* full width */
+}
