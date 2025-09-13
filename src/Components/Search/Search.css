@@ -1,5 +1,5 @@
 .content {
-    flex: 0 0 50%;
+    flex: 0 0 40%;
     display: flex;
     justify-content: start;
     align-items: center;
@@ -14,16 +14,33 @@
 }
 
 
+
 .search_div {
     flex: 0 0 100%;
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
     background-color: #FFFFFF;
     color: #f5f6f8; 
     border: none;
     padding: 5px 5px 5px 15px;
     box-sizing: border-box;
+    height: 60px;
+}
+
+.div_fit
+{
+    flex: 0 0 70%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    background-color: #FFFFFF;
+    color: #f5f6f8; 
+    border: none;
+   
+    box-sizing: border-box;
+    height: 60px;
+
 }
 
 .search_inp {
@@ -36,6 +53,7 @@
     font-weight: 500;
     font-size: 19px;
     font-family: 'Inter', sans-serif;
+  
 }
 
 .search_inp::placeholder {
@@ -99,7 +117,9 @@
 {
     padding: 0;
     margin: 0;
-    font-size: small;
+    font-size: 11px;
+    color: #9e9e9e;
+    font-weight: 450;
 }
 
 
@@ -167,10 +187,38 @@
     border: none;
     flex-wrap: wrap;
     box-sizing: border-box;
-    max-height:320px;
+    height:320px;
      overflow-y: scroll;
     scrollbar-width: none;
 
+}
+
+.FrrScroll
+{
+      flex: 0 1 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    color: #f5f6f8;
+    border: none;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    max-height:320px;
+     overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+.searchedElement1,.searchedAfterLoadElement1
+{
+     flex: 0 1 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    color: #f5f6f8;
+    border: none;
+    flex-wrap: wrap;
 }
 
 .searchedElement {

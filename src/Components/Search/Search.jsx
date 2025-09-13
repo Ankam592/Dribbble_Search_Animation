@@ -1,55 +1,40 @@
-import React, { useState, useMemo, useEffect,Suspense } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import "./Search.css";
 import { dataArray } from "../../assets/data";
-
 import { motion, AnimatePresence, easeInOut } from "framer-motion";
-const SearchedElement = React.lazy(() => import('../SearchedElement/SearchedElement'))
-const SkeletonCard = React.lazy(() => import('../SkeletonCard/SkeletonCard'))
-import { useItemLength } from "../../Hooks/ItemLength";
-const Toggle = React.lazy(() => import('../Toggle/Toggle'))
-
 import { FaPaperclip, FaUser, FaRegCommentDots, FaListUl, FaCog } from 'react-icons/fa';
 import { FiSearch } from "react-icons/fi";
+import { useItemLength } from "../../Hooks/ItemLength";
 
- const Search = () => {
+const Toggle = React.lazy(() => import('../Toggle/Toggle'))
+const SearchedElement = React.lazy(() => import('../SearchedElement/SearchedElement'))
+const SkeletonCard = React.lazy(() => import('../SkeletonCard/SkeletonCard'))
+
+let debounceTimer; // 👈 lives outside the component (persists)
+const debounce = (fn, delay) => {
+    return function (...args) {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+};
+
+
+const Search = () => {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
-    const [searchedData, setSearchedData] = useState([]);
     const [activeItem, setactive] = useState('All');
     const [IsOpen, setOpen] = useState(false);
     const [people, setPeople] = useState(false)
-    const [file, setFile] = useState(false)
+    const [fcount, setFcount] = useState(0);
+    const [file, setFile] = useState(true)
+    const [pcount, setPcount] = useState(0);
     const [chat, setChat] = useState(false)
+    const [ccount, setCcount] = useState(0);
     const [list, setList] = useState(false)
-
-    const items = [
-        {
-            name: "All",
-            isActive: true,
-            icon: ''
-        },
-        {
-            name: "Files",
-            isActive: false,
-            icon: <FaPaperclip size={15} color="#9e9e9e" />
-        },
-        {
-            name: "People",
-            isActive: false,
-            icon: <FaUser size={15} color="#9e9e9e" />
-        },
-        {
-            name: "Chat",
-            isActive: false,
-            icon: <FaRegCommentDots size={15} color="#9e9e9e" />
-        },
-        {
-            name: "List",
-            isActive: false,
-            icon: <FaListUl size={15} color="#9e9e9e" />
-        }];
-
-
+    const [lcount, setLcount] = useState(0);
+    const [count, setCount] = useState(0);
 
 
     // Filtered results
@@ -66,54 +51,82 @@ import { FiSearch } from "react-icons/fi";
     useEffect(() => {
         if (input === "") {
             setLoading(false);
-            setSearchedData([]);
             return;
         }
+        const filescount = useItemLength(filteredData, 'file');
+        const peoplecount = useItemLength(filteredData, 'people');
+        const chatcount = useItemLength(filteredData, 'chat');
+        const listcount = useItemLength(filteredData, 'list');
+        setLoading(true)
 
-        setLoading(true);
+        setCount(0);
+        setFcount(0);
+        setPcount(0);
+        setCcount(0);
+        setLcount(0);
+
         const timer = setTimeout(() => {
-            setSearchedData(filteredData);
             setLoading(false);
+
         }, 1000); // 1.2s delay
 
-        return () => clearTimeout(timer);
+
+
+        return () => {
+            clearTimeout(timer)
+        }
     }, [input, filteredData]);
 
-    return (
 
+    const handleSearch = (value) => {
+    }
+
+    const deb = debounce(handleSearch, 2000)
+
+
+    return (
         <AnimatePresence mode="wait">
             <motion.div
                 layout
-                transition={{ layout: { duration: 0.4, ease: "easeInOut" } }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}   // 👈 add this for closing
+                transition={{ layout: { duration: 1, ease: "easeInOut" } }}
                 className="content" >
                 {/* 🔍 Search bar */}
+
                 <div className="search_div">
-                    <div className="icon">
-                        {loading ? (
-                            <motion.div
-                                style={{
-                                    width: 15, height: 15, border: "3px solid #f3f3f3", borderTop: "3px solid #9e9e9e", borderRadius: "50%"
-                                }}
-                                animate={{ rotate: 360 }}
-                                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                exit={{ opacity: 0, transition: { duration: 0.4 } }}
-                            >
-                                {/* <FiSearch size={25} className="search_icon" /> */}
-                            </motion.div>
-                        ) : (
-                            <FiSearch size={21} className="search_icon" />
+                    <div className="div_fit">
+                        <div className="icon">
+                            {loading ? (
+                                <motion.div
+                                    style={{
+                                        width: 15, height: 15, border: "3px solid #f3f3f3", borderTop: "3px solid #9e9e9e", borderRadius: "50%"
+                                    }}
+                                    animate={{ rotate: 360 }}
+                                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                    exit={{ opacity: 0, transition: { duration: 0.4 } }}
+                                >
 
-                        )}
+                                </motion.div>
+                            ) : (
+                                <FiSearch size={21} className="search_icon" />
+
+                            )}
+                        </div>
+
+                        <input
+                            type="text"
+                            value={input}
+                            onChange={(e) => {
+                                setInput(e.target.value)
+                                deb(e.target.value)
+                            }}
+                            placeholder="Searching is easier"
+                            className="search_inp"
+                            style={input ? { color: "black" } : null}
+                        />
                     </div>
-
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="Searching is easier"
-                        className="search_inp"
-                        style={input ? { color: "black" } : null}
-                    />
 
                     {/* Clear vs Quick Access */}
                     <AnimatePresence mode="wait">
@@ -155,7 +168,7 @@ import { FiSearch } from "react-icons/fi";
                     </AnimatePresence>
                 </div>
                 {/* 🔄 Results / Skeleton */}
-                <motion.div layout className="searched_div">
+                {input && <div className="searched_div">
 
                     {input && <div className="fit"><div className="Types">
                         <div className={activeItem === 'All' ? "Item active" : "Item"} onClick={() => setactive('All')}>
@@ -232,48 +245,43 @@ import { FiSearch } from "react-icons/fi";
 
                     }
                     <div className="FrScroll">
-                        <AnimatePresence>
-                            {(loading) &&
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <motion.div
-                                        key={`skeleton-${i}`}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.3, delay: i * 0.1 }}
-                                        className="searchedElement"
-                                    >
-                                        <Suspense fallback={<div>Loading...</div>}>
-                                            <SkeletonCard />
-                                        </Suspense>
-                                    </motion.div>
-                                ))}
-                        </AnimatePresence>
+                        <AnimatePresence mode="wait">
+                            {(() => {
+                                const visibleItems =
+                                    activeItem === "All"
+                                        ? filteredData
+                                        : filteredData.filter((it) => it.type === activeItem);
 
-                        <AnimatePresence>
-                            {(!loading) &&
-                                searchedData.map((current, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                                        className="searchedAfterLoadElement"
-                                    >
-                                        {activeItem === 'All' ? <Suspense fallback={<div>Loading...</div>}>
-                                            <SearchedElement input={input} element={current} />
-                                        </Suspense> :
+                                const slots = Math.max(6, visibleItems.length);
 
-                                            activeItem === current.type && <Suspense fallback={<div>Loading...</div>}>
-                                                <SearchedElement input={input} element={current} />
+                                return Array.from({ length: slots }).map((_, i) => {
+                                    const item = visibleItems[i];
+
+                                    return (
+                                        <motion.div
+                                            key={`slot-${i}-${item?.id ?? "skeleton"}`}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.4, delay: i * 0.08 }}
+                                            className={item ? "searchedAfterLoadElement" : "searchedElement"}
+                                        >
+                                            <Suspense fallback={<div>Loading...</div>}>
+                                                {loading || !item ? (
+                                                    <SkeletonCard />
+                                                ) :  (
+                                                    <SearchedElement input={input} element={item} />
+                                                )}
                                             </Suspense>
-                                        }
-                                    </motion.div>
-                                ))}
+                                        </motion.div>
+                                    );
+                                });
+                            })()}
                         </AnimatePresence>
                     </div>
-                </motion.div>
+
+
+                </div>}
             </motion.div>
         </AnimatePresence>
 
