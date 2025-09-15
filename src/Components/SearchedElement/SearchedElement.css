@@ -116,6 +116,7 @@
   display: flex;
   justify-content: center;
   align-items: end;
+  background-color: #e0e0e0;
 }
 
 .filesCount p {
@@ -163,7 +164,7 @@
 .copylinkTitle {
 
   position: absolute;
-  top: -50%;
+  top: -35%;
   right: 58%;
   width: 75px;
   height: 17px;

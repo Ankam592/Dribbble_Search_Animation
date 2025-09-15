@@ -1,43 +1,40 @@
 import React, { useState, useMemo, useEffect, Suspense } from "react";
 import "./Search.css";
 import { dataArray } from "../../assets/data";
-import { motion, AnimatePresence, easeInOut } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaPaperclip, FaUser, FaRegCommentDots, FaListUl, FaCog } from 'react-icons/fa';
-import { FiSearch } from "react-icons/fi";
 import { useItemLength } from "../../Hooks/ItemLength";
+import { AiFillSetting, AiOutlineSetting } from "react-icons/ai";
 
-const Toggle = React.lazy(() => import('../Toggle/Toggle'))
+// Lazy loaded components (code-splitting for performance)
+const SearchInput = React.lazy(() => import('../SearchInput/SearchInput'))
 const SearchedElement = React.lazy(() => import('../SearchedElement/SearchedElement'))
 const SkeletonCard = React.lazy(() => import('../SkeletonCard/SkeletonCard'))
-
-let debounceTimer; // 👈 lives outside the component (persists)
-const debounce = (fn, delay) => {
-    return function (...args) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            fn(...args);
-        }, delay);
-    };
-};
-
+const Dropdown = React.lazy(() => import('../Dropdown/Dropdown'))
 
 const Search = () => {
-    const [input, setInput] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [activeItem, setactive] = useState('All');
-    const [IsOpen, setOpen] = useState(false);
+    // Core states
+    const [input, setInput] = useState("");       // Search text
+    const [loading, setLoading] = useState(false); // Skeleton/loader toggle
+    const [activeItem, setactive] = useState('All'); // Active filter tab
+    const [IsOpen, setOpen] = useState(false);    // Dropdown open/close
+    const [outerDone, setOuter] = useState(false);
+    const [innerAnimationdone, setInnerAnimation] = useState(false);
+
+    // Toggle states for filters
     const [people, setPeople] = useState(false)
-    const [fcount, setFcount] = useState(0);
     const [file, setFile] = useState(true)
-    const [pcount, setPcount] = useState(0);
     const [chat, setChat] = useState(false)
-    const [ccount, setCcount] = useState(0);
     const [list, setList] = useState(false)
+
+    // Count states
+    const [fcount, setFcount] = useState(0);
+    const [pcount, setPcount] = useState(0);
+    const [ccount, setCcount] = useState(0);
     const [lcount, setLcount] = useState(0);
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(0); // Total count
 
-
-    // Filtered results
+    // Filtered results memoized for performance
     const filteredData = useMemo(() => {
         if (input === "") return [];
         return dataArray.filter((current) =>
@@ -45,248 +42,196 @@ const Search = () => {
         );
     }, [input]);
 
+    // Items list for tabs
+    const items = [
+        { key: "All", label: "All", icon: null, show: true, count: count, toggle: null },
+        { key: "file", label: "Files", icon: <FaPaperclip size={15} color="#9e9e9e" />, show: file, count: fcount, toggle: setFile },
+        { key: "people", label: "People", icon: <FaUser size={15} color="#9e9e9e" />, show: people, count: pcount, toggle: setPeople },
+        { key: "chat", label: "Chat", icon: <FaRegCommentDots size={15} color="#9e9e9e" />, show: chat, count: ccount, toggle: setChat },
+        { key: "list", label: "List", icon: <FaListUl size={15} color="#9e9e9e" />, show: list, count: lcount, toggle: setList },
+    ];
 
-
-    // Fake backend delay
+    // Fake backend delay simulation + animated counters
     useEffect(() => {
         if (input === "") {
             setLoading(false);
             return;
         }
+
+        // Count items by category
         const filescount = useItemLength(filteredData, 'file');
         const peoplecount = useItemLength(filteredData, 'people');
         const chatcount = useItemLength(filteredData, 'chat');
         const listcount = useItemLength(filteredData, 'list');
+
+        // Start loading state
+        setInnerAnimation(false);
         setLoading(true)
 
-        setCount(0);
-        setFcount(0);
-        setPcount(0);
-        setCcount(0);
-        setLcount(0);
+        // Increment counters gradually (for smooth animation)
+        let f = 0, p = 0, c = 0, l = 0, t = 0;
+        let totalInterval, finterval, pinterval, cinterval, linterval;
 
-        const timer = setTimeout(() => {
-            setLoading(false);
+        if (filteredData.length > 0) {
+            totalInterval = setInterval(() => {
+                t = t + 1;
+                setCount(t);
+                if (t === filteredData.length) clearInterval(totalInterval);
+            }, 800 / filteredData.length);
 
-        }, 1000); // 1.2s delay
+            filescount > 0 ? finterval = setInterval(() => {
+                f = f + 1;
+                setFcount(f);
+                if (f >= filescount) clearInterval(finterval);
+            }, 800 / filescount) : setFcount(0)
 
+            peoplecount > 0 ? pinterval = setInterval(() => {
+                p = p + 1;
+                setPcount(p);
+                if (p >= peoplecount) clearInterval(pinterval);
+            }, 800 / peoplecount) : setPcount(0)
 
+            chatcount > 0 ? cinterval = setInterval(() => {
+                c = c + 1;
+                setCcount(c);
+                if (c >= chatcount) clearInterval(cinterval);
+            }, 800 / chatcount) : setCcount(0)
+
+            listcount > 0 ? linterval = setInterval(() => {
+                l = l + 1;
+                setLcount(l);
+                if (l >= listcount) clearInterval(linterval);
+            }, 800 / listcount) : setLcount(0)
+        } else {
+            setCount(0)
+            setFcount(0)
+            setCcount(0)
+            setPcount(0)
+            setLcount(0)
+        }
+
+        const timer = setTimeout(() => { setLoading(false) }, 800);
 
         return () => {
             clearTimeout(timer)
+            clearInterval(totalInterval);
+            clearInterval(finterval);
+            clearInterval(pinterval);
+            clearInterval(cinterval);
+            clearInterval(linterval);
         }
     }, [input, filteredData]);
 
-
-    const handleSearch = (value) => {
-    }
-
-    const deb = debounce(handleSearch, 2000)
-
-
     return (
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
             <motion.div
-                layout
+                className="content"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}   // 👈 add this for closing
-                transition={{ layout: { duration: 1, ease: "easeInOut" } }}
-                className="content" >
-                {/* 🔍 Search bar */}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+            >
+                {/* 🔹 Search Input */}
+                <SearchInput loading={loading} input={input} setInput={setInput} />
 
-                <div className="search_div">
-                    <div className="div_fit">
-                        <div className="icon">
-                            {loading ? (
-                                <motion.div
-                                    style={{
-                                        width: 15, height: 15, border: "3px solid #f3f3f3", borderTop: "3px solid #9e9e9e", borderRadius: "50%"
-                                    }}
-                                    animate={{ rotate: 360 }}
-                                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                    exit={{ opacity: 0, transition: { duration: 0.4 } }}
-                                >
-
-                                </motion.div>
-                            ) : (
-                                <FiSearch size={21} className="search_icon" />
-
-                            )}
-                        </div>
-
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => {
-                                setInput(e.target.value)
-                                deb(e.target.value)
-                            }}
-                            placeholder="Searching is easier"
-                            className="search_inp"
-                            style={input ? { color: "black" } : null}
-                        />
-                    </div>
-
-                    {/* Clear vs Quick Access */}
-                    <AnimatePresence mode="wait">
-                        {!input ? (
-                            <motion.div
-                                key="quickaccess-group"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.5 }}
-                                style={{ display: "flex", gap: "10px" }}
-                            >
-                                <div className="icn">
-                                    <div className="inner_icn">
-                                        <p>s</p>
-                                    </div>
+                {/* 🔹 Results / Skeleton */}
+                <AnimatePresence>
+                    {input && (
+                        <motion.div
+                            className="searched_div"
+                            initial={{ opacity: 1, scaleY: 1 }}
+                            animate={{ opacity: 1, scaleY: 1 }}
+                            exit={{ opacity: 0, scaleY: 0 }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                            style={{ transformOrigin: "bottom" }}
+                        >
+                            {/* 🔹 Filter Tabs */}
+                            <div className="fit">
+                                <div className="Types">
+                                    {items.map(item => (
+                                        item.show && (
+                                            <div
+                                                key={item.key}
+                                                className={activeItem === item.key ? "Item active" : "Item"}
+                                                onClick={() => setactive(item.key)}
+                                            >
+                                                {item.icon && <div className="con">{item.icon}</div>}
+                                                <div>
+                                                    <h1 className={activeItem === item.key ? "content_ active" : "Content"}>
+                                                        {item.label}
+                                                    </h1>
+                                                </div>
+                                                <div className="Count">
+                                                    <p className="count">{item.count}</p>
+                                                </div>
+                                            </div>
+                                        )
+                                    ))}
                                 </div>
-                                <div className="quick_access">
-                                    <p>quick access</p>
+
+                                {/* 🔹 Settings Dropdown */}
+                                <div className="settings" style={{ position: "relative", width: 20, height: 20 }}>
+                                    <motion.div
+                                        style={{
+                                            width: "24px",
+                                            height: "24px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                        animate={{ rotate: IsOpen ? 90 : 0 }}
+                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    >
+                                        <FaCog size={15} color="#9e9e9e" onClick={() => setOpen(prev => !prev)} />
+                                    </motion.div>
+                                    <Dropdown items={items} IsOpen={IsOpen} />
                                 </div>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="clear-group"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.5 }}
-                                style={{ display: "flex" }}
-                                className="clr"
-                            >
-                                <div className="clear">
-                                    <a className="anchor_clear" onClick={() => setInput("")}>
-                                        Clear
-                                    </a>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-                {/* 🔄 Results / Skeleton */}
-                {input && <div className="searched_div">
+                            </div>
 
-                    {input && <div className="fit"><div className="Types">
-                        <div className={activeItem === 'All' ? "Item active" : "Item"} onClick={() => setactive('All')}>
-                            <div> <h1 className={activeItem === 'All' ? "content_ active" : "Content"}>All</h1></div>
-                            <div className="Count">  <p className="count">{filteredData.length}</p></div>
-                        </div>
-                        {file && <div className={activeItem === 'file' ? "Item active" : "Item"} onClick={() => setactive('file')}>
-                            <div className="con"><FaPaperclip size={15} color="#9e9e9e" /></div>
-                            <div> <h1 className={activeItem === 'file' ? "content_ active" : "Content"}>Files</h1></div>
-                            <div className="Count">  <p className="count">{filteredData && useItemLength(filteredData, 'file')}</p></div>
-                        </div>}
-                        {people && <div className={activeItem === 'people' ? "Item active" : "Item"} onClick={() => setactive('people')}>
-                            <div className="con"> <FaUser size={15} color="#9e9e9e" /></div>
-                            <div> <h1 className={activeItem === 'people' ? "content_ active" : "Content"}>People</h1></div>
-                            <div className="Count">   <p className="count">{filteredData && useItemLength(filteredData, 'people')}</p></div>
-                        </div>}
-                        {chat && <div className={activeItem === 'chat' ? "Item active" : "Item"} onClick={() => setactive('chat')}>
-                            <div className="con"> <FaRegCommentDots size={15} color="#9e9e9e" /></div>
-                            <div> <h1 className={activeItem === 'chat' ? "content_ active" : "Content"}>Chat</h1></div>
-                            <div className="Count">  <p className="count">{filteredData && useItemLength(filteredData, 'chat')}</p></div>
-                        </div>}
-                        {list && <div className={activeItem === 'list' ? "Item active" : "Item"} onClick={() => setactive('list')}>
-                            <div className="con"><FaListUl size={15} color="#9e9e9e" /></div>
-                            <div> <h1 className={activeItem === 'list' ? "content_ active" : "Content"}>List</h1></div>
-                            <div className="Count">  <p className="count">{filteredData && useItemLength(filteredData, 'list')}</p></div>
-                        </div>}
+                            {/* 🔹 Search Results */}
+                            <div className="FrScroll">
+                                <AnimatePresence mode="wait">
+                                    {(() => {
+                                        const dataItems =
+                                            activeItem === "All"
+                                                ? filteredData
+                                                : filteredData.filter(it => it.type === activeItem);
 
+                                        const slots = Array.from(
+                                            { length: Math.max(dataItems.length, 6) },
+                                            (_, i) => dataItems[i] ?? null
+                                        );
 
-                    </div><div className="settings">  <FaCog size={15} color="#9e9e9e" onClick={() => setOpen(prev => !prev)} />
-
-                            {IsOpen && (
-                                <div className="dropdown">
-                                    <div>
-
-                                        <div className="con"><FaPaperclip size={15} color="#9e9e9e" /></div>
-                                        <div className="hdiv"><h1>Files</h1></div>
-
-                                        <Suspense fallback={<div>Loading...</div>}>
-                                            <Toggle isOn={file} setisOn={setFile} />
-                                        </Suspense>
-
-                                    </div>
-                                    <div>
-                                        <div className="con"> <FaUser size={15} color="#9e9e9e" /></div>
-                                        <div className="hdiv"><h1>People</h1></div>
-                                        <Suspense fallback={<div>Loading...</div>}>
-                                            <Toggle isOn={people} setisOn={setPeople} />
-                                        </Suspense>
-
-                                    </div>
-
-                                    <div>
-                                        <div className="con"> <FaRegCommentDots size={15} color="#9e9e9e" /></div>
-                                        <div className="hdiv"><h1>Chats</h1></div>
-                                        <Suspense fallback={<div>Loading...</div>}>
-                                            <Toggle isOn={chat} setisOn={setChat} />
-                                        </Suspense>
-
-                                    </div>
-
-                                    <div>
-                                        <div className="con"><FaListUl size={15} color="#9e9e9e" /></div>
-                                        <div className="hdiv"><h1>Lists</h1></div>
-                                        <Suspense fallback={<div>Loading...</div>}>
-                                            <Toggle isOn={list} setisOn={setList} />
-                                        </Suspense>
-
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-
-                    }
-                    <div className="FrScroll">
-                        <AnimatePresence mode="wait">
-                            {(() => {
-                                const visibleItems =
-                                    activeItem === "All"
-                                        ? filteredData
-                                        : filteredData.filter((it) => it.type === activeItem);
-
-                                const slots = Math.max(6, visibleItems.length);
-
-                                return Array.from({ length: slots }).map((_, i) => {
-                                    const item = visibleItems[i];
-
-                                    return (
-                                        <motion.div
-                                            key={`slot-${i}-${item?.id ?? "skeleton"}`}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -10 }}
-                                            transition={{ duration: 0.4, delay: i * 0.08 }}
-                                            className={item ? "searchedAfterLoadElement" : "searchedElement"}
-                                        >
-                                            <Suspense fallback={<div>Loading...</div>}>
-                                                {loading || !item ? (
-                                                    <SkeletonCard />
-                                                ) :  (
+                                        return slots.map((item, i) => (
+                                            <motion.div
+                                                key={`${item ? `data-${item.id}` : `skeleton-${i}`}-${input}-${activeItem}`}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{ duration: 0.4, delay: i * 0.08 }}
+                                                className={item ? "searchedAfterLoadElement" : "searchedElement"}
+                                            >
+                                                {item ? (
                                                     <SearchedElement input={input} element={item} />
+                                                ) : (
+                                                    <SkeletonCard />
                                                 )}
-                                            </Suspense>
-                                        </motion.div>
-                                    );
-                                });
-                            })()}
-                        </AnimatePresence>
-                    </div>
-
-
-                </div>}
+                                            </motion.div>
+                                        ));
+                                    })()}
+                                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </AnimatePresence>
 
+
+
+
+
     );
 };
-
 
 export default Search;

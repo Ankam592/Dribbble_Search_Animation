@@ -7,6 +7,10 @@ html, body {
   width: 100%;       /* full width */
 }
 
+body
+{
+  cursor: none;
+}
 .main_div {
   flex: 0 1 auto;   /* let it size naturally */
   display: flex;

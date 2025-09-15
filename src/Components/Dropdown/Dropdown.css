@@ -1,0 +1,48 @@
+.dropdown {
+    flex:0 0 180px;
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 10px;
+    
+}
+
+.dropdown > div {
+    width: 130px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+}
+
+.drop
+{
+    border-radius: 2px;
+}
+
+.drop:hover
+{
+   background-color: #f5f6f8;
+}
+
+
+
+
+.hdiv
+{
+    width: 80px;
+}
+
+.hdiv h1 {
+    
+    font-size: 15px;
+    margin: 0;
+    font-weight: 500;
+    color: #333;
+    
+}
