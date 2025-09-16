@@ -67,6 +67,7 @@ const Search = () => {
         // Start loading state
         setInnerAnimation(false);
         setLoading(true)
+        const timer = setTimeout(() => { setLoading(false) }, 1000);
 
         // Increment counters gradually (for smooth animation)
         let f = 0, p = 0, c = 0, l = 0, t = 0;
@@ -110,7 +111,7 @@ const Search = () => {
             setLcount(0)
         }
 
-        const timer = setTimeout(() => { setLoading(false) }, 800);
+
 
         return () => {
             clearTimeout(timer)
@@ -125,6 +126,7 @@ const Search = () => {
     return (
         <AnimatePresence>
             <motion.div
+                layout
                 className="content"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -139,11 +141,15 @@ const Search = () => {
                     {input && (
                         <motion.div
                             className="searched_div"
-                            initial={{ opacity: 1, scaleY: 1 }}
-                            animate={{ opacity: 1, scaleY: 1 }}
-                            exit={{ opacity: 0, scaleY: 0 }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                            style={{ transformOrigin: "bottom" }}
+                            initial={{ opacity: 1, height: "auto" }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{
+                                duration: 1,
+                                ease: "easeInOut",
+                                delay: 0.05
+                            }}
+                            style={{ overflow: "hidden" }}
                         >
                             {/* 🔹 Filter Tabs */}
                             <div className="fit">
@@ -190,8 +196,23 @@ const Search = () => {
 
                             {/* 🔹 Search Results */}
                             <div className="FrScroll">
-                                <AnimatePresence mode="wait">
-                                    {(() => {
+                                {loading ? (
+                                    // Show ONLY skeletons while loading
+                                    Array.from({ length: 6 }).map((_, i) => (
+                                        <motion.div
+                                            key={`skeleton-${i}`}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.4, delay: i * 0.08 }}
+                                            className="searchedElement"
+                                        >
+                                            <SkeletonCard />
+                                        </motion.div>
+                                    ))
+                                ) : (
+                                    // Show data once loading finishes
+                                    (() => {
                                         const dataItems =
                                             activeItem === "All"
                                                 ? filteredData
@@ -208,7 +229,7 @@ const Search = () => {
                                                 initial={{ opacity: 0, y: 10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -10 }}
-                                                transition={{ duration: 0.4, delay: i * 0.08 }}
+                                                transition={{ duration: 0.5, delay: i * 0.08 }}
                                                 className={item ? "searchedAfterLoadElement" : "searchedElement"}
                                             >
                                                 {item ? (
@@ -218,9 +239,12 @@ const Search = () => {
                                                 )}
                                             </motion.div>
                                         ));
-                                    })()}
-                                </AnimatePresence>
+                                    })()
+                                )}
                             </div>
+
+
+
                         </motion.div>
                     )}
                 </AnimatePresence>

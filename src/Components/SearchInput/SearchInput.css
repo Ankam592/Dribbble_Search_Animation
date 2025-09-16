@@ -58,10 +58,10 @@
 
 .icn {
     border: 1px solid #9e9e9e;
-    border-radius: 10px;
-    flex: 0 0 30px;
+    border-radius: 8px;
+    flex: 0 0 21px;
     display: flex;
-    height: 2em;
+    height: 1.5em;
     justify-content: center;
     align-items: center;
     position: relative;
@@ -71,7 +71,7 @@
     border-bottom: 1px solid #9e9e9e;
     border-left: 1px solid #9e9e9e;
     border-right: 1px solid #9e9e9e;
-    border-radius: 10px;
+    border-radius: 8px;
     width: 100%;
     height: 90%;
     display: flex;
@@ -80,6 +80,15 @@
     position: absolute;
     top: 0px;
     color: #9e9e9e;
+}
+
+.inner_icn p
+{
+     padding: 0;
+    margin: 0;
+    font-size: 11px;
+    color: #9e9e9e;
+    font-weight: 550;
 }
 
 .quick_access
@@ -100,7 +109,7 @@
     margin: 0;
     font-size: 11px;
     color: #9e9e9e;
-    font-weight: 450;
+    font-weight: 550;
 }
 
 
