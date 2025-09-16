@@ -4,7 +4,6 @@ import { dataArray } from "../../assets/data";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPaperclip, FaUser, FaRegCommentDots, FaListUl, FaCog } from 'react-icons/fa';
 import { useItemLength } from "../../Hooks/ItemLength";
-import { AiFillSetting, AiOutlineSetting } from "react-icons/ai";
 
 // Lazy loaded components (code-splitting for performance)
 const SearchInput = React.lazy(() => import('../SearchInput/SearchInput'))
@@ -124,7 +123,8 @@ const Search = () => {
     }, [input, filteredData]);
 
     return (
-        <AnimatePresence>
+// outer Animation
+        <AnimatePresence>           
             <motion.div
                 layout
                 className="content"
@@ -136,7 +136,8 @@ const Search = () => {
                 {/* 🔹 Search Input */}
                 <SearchInput loading={loading} input={input} setInput={setInput} />
 
-                {/* 🔹 Results / Skeleton */}
+                {/* 🔹 Results / Skeleton  and Inner Animatin for data smooth exit*/}
+
                 <AnimatePresence>
                     {input && (
                         <motion.div
@@ -195,6 +196,7 @@ const Search = () => {
                             </div>
 
                             {/* 🔹 Search Results */}
+                            {/* Dynamic data showing on the UI : Nodata -> only skeleton card component If data then both SearchedElement and skeleton card. */}
                             <div className="FrScroll">
                                 {loading ? (
                                     // Show ONLY skeletons while loading
