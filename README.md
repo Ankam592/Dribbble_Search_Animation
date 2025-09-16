@@ -60,7 +60,7 @@ Vercel (Hosting)
 Clone the repo and install dependencies:
 
 # Clone this repository
-git clone https://github.com/your-username/interactive-search-react.git
+git clone https://github.com/Ankam592/Dribbble_Search_Animation.git
 
 # Navigate to project folder
 cd interactive-search-react
